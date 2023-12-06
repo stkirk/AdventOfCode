@@ -1,7 +1,7 @@
-const logAnswer = require("./logAnswer");
-const txtFilePath = "../data/day4.txt";
+import { logAnswer } from "./logAnswer";
+const day4Text = "../data/day4.txt";
 
-const getWinCount = (numberList) => {
+const getWinCount = (numberList: string[][]) => {
   let winCount = 0;
   const winners = numberList[0];
   const myNumbers = numberList[1];
@@ -13,14 +13,15 @@ const getWinCount = (numberList) => {
   return winCount;
 };
 
-const sumScratchCardPoints = (text) => {
+const sumScratchCardPoints = (text: string) => {
   const textLines = text.split("\n");
   // init hashMap with index + 1 to id Card # as key and numbersList as value
   // ex {1: [[41, 48, 52, ...], [83, 86, 6 ...]], 2: [[99], [5]]...}
-  const cardMap = {};
+  const cardMap: any = {};
   // split each line into two arrays, winners and myNumbers
+  // const arr = [[['1', '2', '3'], ['4', '5', '6'], 1], [['7', '8', '9'], ['a', 'b', 'c'], 2]]
   const numbersList = textLines.map((line, index) => {
-    const newList = line
+    const newList: any[] = line
       .split(":")[1]
       .split("|")
       .map((l) => l.split(" ").filter((str) => !!str));
@@ -74,13 +75,13 @@ const sumScratchCardPoints = (text) => {
   return [totalPoints, cardTotals.reduce((acc, cur) => acc + cur, 0)];
 };
 
-const example = `Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+const ex4 = `Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
 Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
 Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
 Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11`;
 
-// console.log("example", sumScratchCardPoints(example));
+// console.log("ex4", sumScratchCardPoints(ex4));
 
-logAnswer(txtFilePath, sumScratchCardPoints); //9,721,255 9,721,255
+logAnswer(day4Text, sumScratchCardPoints); //9,721,255 9,721,255

@@ -1,26 +1,26 @@
-const fs = require("fs");
-const txtFilePath = "../data/day2.txt";
+import { logAnswer } from "./logAnswer";
+const day2Text = "../data/day2.txt";
 
-// type round = {
-//   redCount: number,
-//   greenCount: number,
-//   blueCount: number,
-// }
-// type game = {
-//   id: number,
-//   rounds: round[],
-// }
+type Round = {
+  redCount: number;
+  greenCount: number;
+  blueCount: number;
+};
+type Game = {
+  id: number;
+  rounds?: Round[];
+};
 
 const redLimit = 12;
 const greenLimit = 13;
 const blueLimit = 14;
 
-const sumValidGameIds = (text) => {
+const sumValidGameIds = (text: string) => {
   const gameStringArray = text.split("\n");
   // turn gameStringArray items into a game[]
   const games = gameStringArray.map((gameString, index) => {
     // init newGame object with id
-    const newGame = { id: index + 1 };
+    const newGame: Game = { id: index + 1 };
     // remove 'Game #: ' from each line & split into individual round on '; '
     const roundsString = gameString.split(": ")[1].split("; ");
     const rounds = roundsString.map((roundStr) => {
@@ -64,19 +64,21 @@ const sumValidGameIds = (text) => {
     let minRed = 0;
     let minGreen = 0;
     let minBlue = 0;
-    game.rounds.forEach((round) => {
-      // if round.colorCount > minColor
-      if (round.redCount > minRed) {
-        // reassign minColor = round.colorCount
-        minRed = round.redCount;
-      }
-      if (round.greenCount > minGreen) {
-        minGreen = round.greenCount;
-      }
-      if (round.blueCount > minBlue) {
-        minBlue = round.blueCount;
-      }
-    });
+
+    game.rounds &&
+      game.rounds.forEach((round) => {
+        // if round.colorCount > minColor
+        if (round.redCount > minRed) {
+          // reassign minColor = round.colorCount
+          minRed = round.redCount;
+        }
+        if (round.greenCount > minGreen) {
+          minGreen = round.greenCount;
+        }
+        if (round.blueCount > minBlue) {
+          minBlue = round.blueCount;
+        }
+      });
     // add the power (minRed * minGreen * minBlue) to minPowerGameSum
     const power = minRed * minGreen * minBlue;
     console.log(`power ${index}: `, power);
@@ -113,10 +115,4 @@ Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`;
 // console.log("example sum: ", sumValidGameIds(example));
 
-fs.readFile(txtFilePath, "utf8", (err, data) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log("input sum: ", sumValidGameIds(data));
-});
+logAnswer(day2Text, sumValidGameIds);

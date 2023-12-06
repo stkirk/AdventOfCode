@@ -1,7 +1,7 @@
 const logAnswer = require("./logAnswer");
 const txtFilePath = "../data/day5.txt";
 
-const findClosestLocation = (text) => {
+const findClosestLocation = (text: string) => {
   return text;
 };
 

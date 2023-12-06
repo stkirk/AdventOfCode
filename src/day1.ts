@@ -1,11 +1,15 @@
-const fs = require("fs");
-const txtFilePath = "../data/input.txt";
+import { logAnswer } from "./logAnswer";
+const day1Text = "../data/input.txt";
+
+interface WordNumMap {
+  [key: string]: string;
+}
 
 // given a text file with string seperated by line breaks, combine the first and last
 // number in each string line then add all combined numbers together to get a cummulative
 // calibration target
 // Part 2 - now include written versions of the numbers 1-9: i.e. 'one' = 1
-const sumCalibrationValues = (text) => {
+const sumCalibrationValues = (text: string) => {
   const nums = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
   const numberWords = [
     "one",
@@ -18,7 +22,7 @@ const sumCalibrationValues = (text) => {
     "eight",
     "nine",
   ];
-  const wordNumMap = {};
+  const wordNumMap: WordNumMap = {};
   numberWords.forEach((word, index) => {
     wordNumMap[word] = (index + 1).toString();
   });
@@ -97,7 +101,7 @@ const sumCalibrationValues = (text) => {
     }
     // concat val1 val2, parse to int and add to sum
     console.log(`val1: ${val1}, val2 ${val2}`);
-    const combinedVals = parseInt(val1 + val2);
+    const combinedVals = parseInt(val1! + val2);
     console.log("combinedVals: ", combinedVals);
     sum += combinedVals;
     console.log("interative sum: ", sum);
@@ -113,10 +117,4 @@ const exampleStr =
 // const exampleStr = "xsftnb6mvgqxv17four";
 // console.log(sumCalibrationValues(exampleStr));
 
-fs.readFile(txtFilePath, "utf8", (err, data) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log(sumCalibrationValues(data));
-});
+logAnswer(day1Text, sumCalibrationValues);

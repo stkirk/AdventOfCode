@@ -1,6 +1,9 @@
-const fs = require("fs");
+import * as fs from "fs";
 
-const logAnswer = (txtFilePath, callBack) => {
+export const logAnswer = (
+  txtFilePath: string,
+  callBack: (data: string) => any
+) => {
   fs.readFile(txtFilePath, "utf8", (err, data) => {
     if (err) {
       console.log(err);
@@ -9,5 +12,3 @@ const logAnswer = (txtFilePath, callBack) => {
     console.log("answer: ", callBack(data));
   });
 };
-
-module.exports = logAnswer;

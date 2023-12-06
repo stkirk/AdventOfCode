@@ -1,18 +1,22 @@
-const fs = require("fs");
-const txtFilePath = "../data/day3.txt";
+import { logAnswer } from "./logAnswer";
+const day3Text = "../data/day3.txt";
+
+interface FalseOnly {
+  [key: string]: string[];
+}
 
 // const specialCharRegex = /[^0-9.]/g;
 const notSpecialChar = /^[a-zA-Z0-9.]$/;
 
-function isSpecialCharacter(char) {
+function isSpecialCharacter(char: string) {
   // return specialCharRegex.test(char);
   return !notSpecialChar.test(char);
 }
 
-const decodeEngineSchematic = (text) => {
+const decodeEngineSchematic = (text: string) => {
   const schematicLines = text.split("\n");
   let partNumbersSum = 0;
-  const falseOnly = {};
+  const falseOnly: FalseOnly = {};
 
   for (let i = 0; i < schematicLines.length; i++) {
     const currentLine = schematicLines[i];
@@ -93,17 +97,4 @@ const example = `467..114..
 664...!598`;
 // console.log("example: ", decodeEngineSchematic(example)); //4361
 
-fs.readFile(txtFilePath, "utf8", (err, data) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log("real: ", decodeEngineSchematic(data));
-  // wrong 545564
-  let sum = data
-    .match(
-      /(\d*(?<=[^\d.\n\r].{140,142})\d+)|(\d+(?=.{140,142}[^\d.\n\r])\d*)|((?<=[^\d.\n\r])\d+)|(\d+(?=[^\d.\n\r]))/gs
-    )
-    ?.reduce((p, c) => p + +c, 0);
-  console.log("sum ", sum);
-});
+logAnswer(day3Text, decodeEngineSchematic);
