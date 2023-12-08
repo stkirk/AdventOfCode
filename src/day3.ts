@@ -1,17 +1,11 @@
 import { logAnswer } from "./logAnswer";
 const day3Text = "../data/day3.txt";
 
-const digitRegex = /\d/;
-const specialCharRegex = /[^0-9.]/g;
-// const notSpecialChar = /^[a-zA-Z0-9.]$/;
+const notSpecial = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
+const digitRegex = /\d/;
 function isDigit(char: string) {
   return digitRegex.test(char);
-}
-
-function isSpecialCharacter(char: string) {
-  return char.length && specialCharRegex.test(char);
-  // return !notSpecialChar.test(char);
 }
 
 const decodeEngineSchematic = (text: string) => {
@@ -36,28 +30,25 @@ const decodeEngineSchematic = (text: string) => {
         }
         // check substrings all around the span of curNumber
         const top =
-          y > 0
-            ? lines[y - 1].substring(
+          y === 0
+            ? ""
+            : lines[y - 1].substring(
                 x > 0 ? x - 1 : x,
                 x + curNumber.length < currentLine.length
                   ? x + curNumber.length + 1
                   : x + curNumber.length
-              )
-            : "";
-        const left = x > 0 ? lines[y][x - 1] : "";
-        const right =
-          x + curNumber.length < currentLine.length
-            ? lines[y][x + curNumber.length]
-            : "";
+              );
+        const left = currentLine[x - 1] || "";
+        const right = currentLine[x + curNumber.length] || "";
         const bottom =
-          y < lines.length - 1
-            ? lines[y + 1].substring(
+          y === lines.length - 1
+            ? ""
+            : lines[y + 1].substring(
                 x > 0 ? x - 1 : x,
                 x + curNumber.length < currentLine.length
                   ? x + curNumber.length + 1
                   : x + curNumber.length
-              )
-            : "";
+              );
         // console.log(
         //   "numbie",
         //   curNumber,
@@ -71,9 +62,12 @@ const decodeEngineSchematic = (text: string) => {
         //   bottom
         // );
         const allAdjacentCharacters = (top + bottom + left + right).split("");
-        const isValidPart = allAdjacentCharacters.some((char) =>
-          isSpecialCharacter(char)
-        );
+        let isValidPart = false;
+        for (let c = 0; c < allAdjacentCharacters.length; c++) {
+          if (!notSpecial.includes(allAdjacentCharacters[c])) {
+            isValidPart = true;
+          }
+        }
         console.log(
           "allAdjacentCharacters",
           curNumber,
