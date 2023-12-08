@@ -1,100 +1,106 @@
 import { logAnswer } from "./logAnswer";
 const day3Text = "../data/day3.txt";
 
-interface FalseOnly {
-  [key: string]: string[];
+const digitRegex = /\d/;
+const specialCharRegex = /[^0-9.]/g;
+// const notSpecialChar = /^[a-zA-Z0-9.]$/;
+
+function isDigit(char: string) {
+  return digitRegex.test(char);
 }
 
-// const specialCharRegex = /[^0-9.]/g;
-const notSpecialChar = /^[a-zA-Z0-9.]$/;
-
 function isSpecialCharacter(char: string) {
-  // return specialCharRegex.test(char);
-  return !notSpecialChar.test(char);
+  return char.length && specialCharRegex.test(char);
+  // return !notSpecialChar.test(char);
 }
 
 const decodeEngineSchematic = (text: string) => {
-  const schematicLines = text.split("\n");
+  const lines = text.split("\n");
   let partNumbersSum = 0;
-  const falseOnly: FalseOnly = {};
 
-  for (let i = 0; i < schematicLines.length; i++) {
-    const currentLine = schematicLines[i];
+  // loop through each line
+  for (let y = 0; y < lines.length; y++) {
+    const currentLine = lines[y];
+    // const numbersOnly = currentLine.split(/\D+/).filter((str) => !!str);
 
-    const numbersOnly = currentLine.split(/\D+/).filter((str) => !!str);
-
-    if (!numbersOnly.length) {
-      continue;
+    let curNumber = "";
+    // loop through each char and identify a number along with its coordinates
+    for (let x = 0; x < currentLine.length; x++) {
+      // traverse the line until a digit is found
+      if (isDigit(currentLine[x]) && !isDigit(currentLine[x - 1])) {
+        // keep traversing and appending digits to curNumber until a non digit end index is found
+        let numIndex = x;
+        while (isDigit(currentLine[numIndex])) {
+          curNumber += currentLine[numIndex];
+          numIndex += 1;
+        }
+        // check substrings all around the span of curNumber
+        const top =
+          y > 0
+            ? lines[y - 1].substring(
+                x > 0 ? x - 1 : x,
+                x + curNumber.length < currentLine.length
+                  ? x + curNumber.length + 1
+                  : x + curNumber.length
+              )
+            : "";
+        const left = x > 0 ? lines[y][x - 1] : "";
+        const right =
+          x + curNumber.length < currentLine.length
+            ? lines[y][x + curNumber.length]
+            : "";
+        const bottom =
+          y < lines.length - 1
+            ? lines[y + 1].substring(
+                x > 0 ? x - 1 : x,
+                x + curNumber.length < currentLine.length
+                  ? x + curNumber.length + 1
+                  : x + curNumber.length
+              )
+            : "";
+        // console.log(
+        //   "numbie",
+        //   curNumber,
+        //   "top",
+        //   top,
+        //   "left",
+        //   left,
+        //   "right",
+        //   right,
+        //   "bottom",
+        //   bottom
+        // );
+        const allAdjacentCharacters = (top + bottom + left + right).split("");
+        const isValidPart = allAdjacentCharacters.some((char) =>
+          isSpecialCharacter(char)
+        );
+        console.log(
+          "allAdjacentCharacters",
+          curNumber,
+          isValidPart,
+          allAdjacentCharacters
+        );
+        if (isValidPart) {
+          partNumbersSum += +curNumber;
+        }
+        curNumber = "";
+      }
     }
-    numbersOnly.forEach((number) => {
-      const curStartIndex = currentLine.indexOf(number);
-      const charsToValidate = [];
-      for (let j = curStartIndex; j < curStartIndex + number.length; j++) {
-        const isPreviousCharacter = j !== 0;
-        const isNextCharacter = j < currentLine.length - 1;
-        const isPreviousLine = i !== 0;
-        const isNextLine = i < schematicLines.length - 1;
-        if (isPreviousCharacter) {
-          const prevChar = currentLine[j - 1];
-          charsToValidate.push(prevChar);
-        }
-        if (isPreviousCharacter && isPreviousLine) {
-          const prevLeftChar = schematicLines[i - 1][j - 1];
-          charsToValidate.push(prevLeftChar);
-        }
-        if (isPreviousLine) {
-          const prevTop = schematicLines[i - 1][j];
-          charsToValidate.push(prevTop);
-        }
-        if (isPreviousLine && isNextCharacter) {
-          const prevRight = schematicLines[i - 1][j + 1];
-          charsToValidate.push(prevRight);
-        }
-        if (isNextCharacter) {
-          const nextChar = currentLine[j + 1];
-          charsToValidate.push(nextChar);
-        }
-        if (isNextLine && isNextCharacter) {
-          const nextRight = schematicLines[i + 1][j + 1];
-          charsToValidate.push(nextRight);
-        }
-        if (isNextLine) {
-          const nextBottom = schematicLines[i + 1][j];
-          charsToValidate.push(nextBottom);
-        }
-        if (isNextLine && isPreviousCharacter) {
-          const nextLeft = schematicLines[i + 1][j - 1];
-          charsToValidate.push(nextLeft);
-        }
-      }
-      const isValidPartNumber = charsToValidate.some((char) =>
-        isSpecialCharacter(char)
-      );
-      // console.log(
-      //   `charsToValidate ${number}, add? ${isValidPartNumber}: `,
-      //   charsToValidate
-      // );
-      if (isValidPartNumber) {
-        partNumbersSum += parseInt(number);
-      } else {
-        falseOnly[number] = charsToValidate.filter((char) => char !== ".");
-      }
-    });
   }
-  console.log(falseOnly);
   return partNumbersSum;
 };
 
 const example = `467..114..
-...*......
-..35..633.
+69.*....69
+3.35..633.
 ......#...
 617*......
-.....+..58
-..592.....
-......755.
-..$..*&^%*
-664...!598`;
+.....+.588
+..592*....
+.....*755*
+...$.*...*
+.664.598..`;
 // console.log("example: ", decodeEngineSchematic(example)); //4361
 
 logAnswer(day3Text, decodeEngineSchematic);
+// wrong: 545564, 545443, 504484
