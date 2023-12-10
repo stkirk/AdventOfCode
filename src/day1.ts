@@ -1,5 +1,5 @@
 import { logAnswer } from "./logAnswer";
-const day1Text = "../data/input.txt";
+const day1Text = "../data/day1.txt";
 
 interface WordNumMap {
   [key: string]: string;
