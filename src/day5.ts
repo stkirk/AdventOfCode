@@ -28,35 +28,19 @@ const findClosestLocation = (text: string) => {
       }
     }
   });
-  // console.log("mapArrays", mapArrays);
-  // convert each map into string[][]
-  // then pass into generateSouceDestinationMap to get maps
-  //seed-to-soil
-  const seedToSoilMap = generateSouceDestinationMap(mapArrays[0]);
-  // soil-to-fert
-  const soilToFertMap = generateSouceDestinationMap(mapArrays[1]);
-  // fert-to-water
-  const fertToWaterMap = generateSouceDestinationMap(mapArrays[2]);
-  // water-to-light
-  const waterToLightMap = generateSouceDestinationMap(mapArrays[3]);
-  // light-to-temp
-  const lightToTempMap = generateSouceDestinationMap(mapArrays[4]);
-  // temp-to-humidity
-  const tempToHumidity = generateSouceDestinationMap(mapArrays[5]);
-  // humidity-to-location
-  const humidityToLocation = generateSouceDestinationMap(mapArrays[6]);
+
   // init location[]
   const locations: number[] = [];
-  // for each seed, lookup location by converting through each map, and push number to location[]
+  // for each seed, get destination at each map, and push number to location[]
   seeds.forEach((seed) => {
     const seedNum = parseInt(seed);
-    const soil = seedToSoilMap[seedNum] || seedNum;
-    const fert = soilToFertMap[soil] || soil;
-    const water = fertToWaterMap[fert] || fert;
-    const light = waterToLightMap[water] || water;
-    const temp = lightToTempMap[light] || light;
-    const humidity = tempToHumidity[temp] || temp;
-    const location = humidityToLocation[humidity] || humidity;
+    const soil = getDestination(seedNum, mapArrays[0]);
+    const fert = getDestination(soil, mapArrays[1]);
+    const water = getDestination(fert, mapArrays[2]);
+    const light = getDestination(water, mapArrays[3]);
+    const temp = getDestination(light, mapArrays[4]);
+    const humidity = getDestination(temp, mapArrays[5]);
+    const location = getDestination(humidity, mapArrays[6]);
     locations.push(location);
   });
   //return the minValue in location[]
@@ -64,22 +48,39 @@ const findClosestLocation = (text: string) => {
   return { locations, closestLocation };
 };
 
-function generateSouceDestinationMap(maps: string[][]): SourceDestinationMap {
-  // map looks like: [ [ '50', '98', '2' ], [ '52', '50', '48' ] ]
-  // converts source (ex. seedNumber) -> destination (ex. soilNumber)
-  // { seed1: soil1, seed2: soil2, ...}
-  const sourceToDestinationMap: SourceDestinationMap = {};
-  // console.log("maps", maps);
+function getDestination(source: number, maps: string[][]) {
+  let destination = source;
   maps.forEach((map) => {
-    const destinationStart = parseInt(map[0]);
-    const sourceStart = parseInt(map[1]);
     const range = parseInt(map[2]);
-    for (let i = 0; i < range; i++) {
-      sourceToDestinationMap[sourceStart + i] = destinationStart + i;
+    const sourceStart = parseInt(map[1]);
+    const sourceEnd = sourceStart + range - 1;
+    const destinationStart = parseInt(map[0]);
+    const diff = source - sourceStart;
+    // source is in range, overwrite destination
+    if (source >= sourceStart && source <= sourceEnd) {
+      destination = destinationStart + diff;
     }
   });
-  return sourceToDestinationMap;
+  return destination;
 }
+
+// this works but in practice large numbers create a heap out of memory erro --> too  many keys
+// function generateSouceDestinationMap(maps: string[][]): SourceDestinationMap {
+//   // map looks like: [ [ '50', '98', '2' ], [ '52', '50', '48' ] ]
+//   // converts source (ex. seedNumber) -> destination (ex. soilNumber)
+//   // { seed1: soil1, seed2: soil2, ...}
+//   const sourceToDestinationMap: SourceDestinationMap = {};
+//   // console.log("maps", maps);
+//   maps.forEach((map) => {
+//     const destinationStart = parseInt(map[0]);
+//     const sourceStart = parseInt(map[1]);
+//     const range = parseInt(map[2]);
+//     for (let i = 0; i < range; i++) {
+//       sourceToDestinationMap[sourceStart + i] = destinationStart + i;
+//     }
+//   });
+//   return sourceToDestinationMap;
+// }
 
 const example = `seeds: 79 14 55 13
 
@@ -114,6 +115,6 @@ temperature-to-humidity map:
 humidity-to-location map:
 60 56 37
 56 93 4`;
-console.log("example: ", findClosestLocation(example));
+// console.log("example: ", findClosestLocation(example));
 
-// logAnswer(txtFilePath, findClosestLocation);
+logAnswer(txtFilePath, findClosestLocation);
