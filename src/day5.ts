@@ -8,7 +8,20 @@ interface SourceDestinationMap {
 const findClosestLocation = (text: string) => {
   const input = text.split("\n").filter((line) => line);
   // split seeds into string[]
-  const seeds = input[0].split(": ")[1].split(" ");
+  const seedRanges = input[0].split(": ")[1].split(" ");
+  const seeds: string[] = [];
+  seedRanges.forEach((seed, idx) => {
+    if (idx % 2 === 0) {
+      // capture next range value
+      const seedNum = parseInt(seed);
+      const range = parseInt(seedRanges[idx + 1]);
+      for (let i = seedNum; i < seedNum + range; i++) {
+        seeds.push(i.toString());
+        console.log("seed pushed", i);
+      }
+    }
+    console.log("seeds length:", seeds.length);
+  });
   const rest = input.slice(1);
 
   const mapArrays: string[][][] = [];
@@ -42,6 +55,7 @@ const findClosestLocation = (text: string) => {
     const humidity = getDestination(temp, mapArrays[5]);
     const location = getDestination(humidity, mapArrays[6]);
     locations.push(location);
+    console.log("seeds to check:", seeds.length - locations.length);
   });
   //return the minValue in location[]
   const closestLocation = Math.min(...locations);
