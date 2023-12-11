@@ -56,22 +56,25 @@ const formatText = (text: string) => {
   const directionSequence = lines[0];
   // get keys and left rights into an object of objects
   const nodeMap: { [key: string]: Step } = {};
+  const startNodes: string[] = [];
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     const key = line.split(" = ")[0];
+    if (key[2] === "A") {
+      startNodes.push(key);
+    }
     const direction = line
       .split("(")[1]
       .split(", ")
       .map((str) => str.substring(0, 3));
     nodeMap[key] = { left: direction[0], right: direction[1], value: key };
   }
-  return { directionSequence, nodeMap };
+  return { directionSequence, nodeMap, startNodes };
 };
 
 const getStepsToZZZ = (text: string) => {
   const { directionSequence, nodeMap } = formatText(text);
   const loopedDirections = stringToCircularLinkedList(directionSequence);
-  const startNode = nodeMap["AAA"];
   const finishStepValue = nodeMap["ZZZ"].value;
 
   let currentDirectionNode = loopedDirections.head;
@@ -100,12 +103,59 @@ const getStepsToZZZ = (text: string) => {
     currentDirectionNode = currentDirectionNode!.next;
   }
 };
-const example = `LLR
+
+const getStepsFromAToZs = (text: string) => {
+  const { directionSequence, nodeMap, startNodes } = formatText(text);
+  const loopedDirections = stringToCircularLinkedList(directionSequence);
+
+  let currentDirectionNode = loopedDirections.head;
+  let currentSteps: Step[] = startNodes.map((node) => nodeMap[node]);
+  let steps = 0;
+
+  while (!currentSteps.every((step) => step.value[2] === "Z")) {
+    // copy currentSteps to temp then empty currentSteps
+    const stepsToTake = [...currentSteps];
+    currentSteps = [];
+
+    // take a step for each Step in currentSteps
+    stepsToTake.forEach((step) => {
+      if (currentDirectionNode?.data === "L") {
+        // lookup step.left
+        const leftStep = nodeMap[step.left];
+        // push step left to currentSteps
+        currentSteps.push(leftStep);
+      } else {
+        // currentDirectionNode?.data points to "R"
+        const rightStep = nodeMap[step.right];
+        currentSteps.push(rightStep);
+      }
+    });
+    // increase step counter
+    steps += 1;
+    // set next direction for next step
+    currentDirectionNode = currentDirectionNode!.next;
+    console.log("currentSteps: ", currentSteps);
+    console.log("steps: ", steps);
+  }
+  // every step should be on a Z
+  return steps;
+};
+const example1 = `LLR
 
 AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)`;
+const example2 = `LR
 
-// console.log(getStepsToZZZ(example));
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)`;
 
-logAnswer(txtFilePath, getStepsToZZZ);
+// console.log(getStepsFromAToZs(example2));
+
+logAnswer(txtFilePath, getStepsFromAToZs);
