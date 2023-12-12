@@ -2,8 +2,12 @@ import { logAnswer } from "./logAnswer";
 const txtFilePath = "../data/day9.txt";
 
 const formatText = (text: string) => {
-  const lines = text.split("\n").map((l) => l.split(" ").map((char) => char));
-  return lines;
+  const sequences = text
+    .split("\n")
+    .map((s) => s.split(" ").map((char) => char));
+  const reversedSequences = sequences.map((s) => [...s].reverse());
+  console.log(sequences, reversedSequences);
+  return { sequences, reversedSequences };
 };
 
 const extrapolateSequence = (sequence: string[]): number[][] => {
@@ -48,18 +52,25 @@ const getNextNumber = (extrapolation: number[][]): number => {
 };
 
 const sumExtrapolatedValues = (text: string) => {
-  const sequences = formatText(text);
+  const { sequences, reversedSequences } = formatText(text);
   const extrapolatedValues: number[] = [];
+  const p2ExtrapolatedValues: number[] = [];
 
   // iterate over each sequence and process them
   sequences.forEach((sequence, index) => {
     const extrapolation = extrapolateSequence(sequence);
+    const p2Extrapolation = extrapolateSequence(reversedSequences[index]);
     // using extrapolated sequence get the next value
     const nextNumberInSequence = getNextNumber(extrapolation);
+    const p2NumbersInSequence = getNextNumber(p2Extrapolation);
     extrapolatedValues.push(nextNumberInSequence);
+    p2ExtrapolatedValues.push(p2NumbersInSequence);
   });
 
-  return extrapolatedValues.reduce((acc, val) => (acc += val), 0);
+  return {
+    p1: extrapolatedValues.reduce((acc, val) => (acc += val), 0),
+    p2: p2ExtrapolatedValues.reduce((acc, val) => (acc += val), 0),
+  };
 };
 
 const example = `0 3 6 9 12 15
